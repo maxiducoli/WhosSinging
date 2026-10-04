@@ -1,0 +1,157 @@
+﻿@model List<WhosSinging.Web.Models.Song>
+@{
+    ViewData["Title"] = "Who's Singing";
+}
+
+<!-- ===== PANTALLA DE ENTRADA ===== -->
+<div id="pantalla-inicio" class="pantalla text-center">
+    <h1 class="display-4">Who's Singing</h1>
+    <p class="lead">El juego musical de la familia</p>
+
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label class="form-label">Tu nombre</label>
+                <input id="input-nombre" class="form-control form-control-lg"
+                       maxlength="20" placeholder="Ej: Mamá" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Código de sala (solo para unirte)</label>
+                <input id="input-codigo" class="form-control form-control-lg text-uppercase"
+                       maxlength="5" placeholder="Ej: K7M2P" />
+            </div>
+
+            <div class="form-check mb-3 text-start">
+                <input class="form-check-input" type="checkbox" id="chk-arbitro">
+                <label class="form-check-label" for="chk-arbitro">
+                    Soy el presentador: dirijo el juego sin jugar (solo al crear sala)
+                </label>
+            </div>
+
+            <div class="d-grid gap-2">
+                <button id="btn-crear" class="btn btn-success btn-lg">Crear sala</button>
+                <button id="btn-unirse" class="btn btn-primary btn-lg">Unirme a una sala</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== PANTALLA DE LOBBY ===== -->
+<div id="pantalla-lobby" class="pantalla d-none text-center">
+    <h2 class="display-6">Sala</h2>
+    <p>Pasale este código a tu familia:</p>
+    <h1 id="codigo-sala" class="display-3 text-primary fw-bold">-----</h1>
+
+    <div class="row justify-content-center mt-4">
+        <div class="col-md-6">
+            <ul id="lista-jugadores" class="list-group"></ul>
+        </div>
+    </div>
+
+    <button id="btn-iniciar" class="btn btn-success btn-lg mt-4 d-none">
+        Comenzar el juego
+    </button>
+</div>
+
+<!-- ===== PANTALLA DE JUEGO ===== -->
+<div id="pantalla-juego" class="pantalla d-none text-center">
+    <h2 id="ronda-titulo" class="display-6">Ronda</h2>
+    <div id="contador" class="display-1 fw-bold text-warning">20</div>
+    <p id="aviso-carga" class="text-muted d-none">Cargando audio...</p>
+
+    <audio id="audio-juego"></audio>
+    <button id="btn-escuchar" class="btn btn-outline-secondary mt-2 d-none">
+        ▶ Reproducir clip
+    </button>
+
+    <div id="lista-opciones" class="row justify-content-center g-3 mt-2"></div>
+    <p id="progreso-respuestas" class="text-muted mt-3 d-none"></p>
+    <p id="estado-respuesta" class="text-muted mt-3 d-none">
+        ¡Respuesta recibida! Esperando a los demás...
+    </p>
+
+    <button id="btn-cerrar-ronda" class="btn btn-outline-danger mt-3 d-none">
+        Cerrar ronda ya
+    </button>
+</div>
+
+<!-- ===== PANTALLA DE RESULTADOS ===== -->
+<div id="pantalla-resultados" class="pantalla d-none text-center">
+    <h2 class="display-6">La canción era...</h2>
+    <h1 id="resultado-titulo" class="text-success"></h1>
+    <p id="resultado-artista" class="lead"></p>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <ul id="lista-resultados" class="list-group"></ul>
+        </div>
+    </div>
+
+    <button id="btn-siguiente" class="btn btn-success btn-lg mt-4 d-none">
+        Siguiente ronda
+    </button>
+    <p id="esperando-host" class="text-muted mt-4 d-none">
+        Esperando al anfitrión para continuar...
+    </p>
+</div>
+
+<!-- ===== PANTALLA FINAL ===== -->
+<div id="pantalla-final" class="pantalla d-none text-center">
+    <h1 class="display-4">🏆 Podio final</h1>
+
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <ul id="lista-podio" class="list-group"></ul>
+        </div>
+    </div>
+
+    <button id="btn-revancha" class="btn btn-primary btn-lg mt-4 d-none">
+        ¡Revancha!
+    </button>
+    <p id="esperando-host-final" class="text-muted mt-4 d-none">
+        Esperando al anfitrión...
+    </p>
+</div>
+
+<hr class="my-5" />
+
+<!-- ===== BIBLIOTECA MUSICAL ===== -->
+<h4 class="text-muted">Biblioteca musical: @Model.Count canciones</h4>
+
+@if (Model.Count == 0)
+{
+    <div class="alert alert-warning">
+        Todavía no hay canciones. Descargá una playlist con el script de Python y reiniciá la app.
+    </div>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Título</th>
+                <th>Artista</th>
+                <th>Año</th>
+                <th>Audio</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var song in Model)
+            {
+                <tr>
+                    <td>@song.Id</td>
+                    <td>@song.titulo</td>
+                    <td>@song.artista</td>
+                    <td>@song.año</td>
+                    <td><a href="/audio/@song.Id" target="_blank">▶ Escuchar</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@section Scripts {
+    <script src="/lib/signalr/signalr.min.js"></script>
+    <script src="/js/game.js"></script>
+}
